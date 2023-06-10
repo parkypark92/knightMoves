@@ -29,3 +29,17 @@ function legalMoves(coord) {
   }
   return legal;
 }
+
+function createGraph(start, adjList = new Map()) {
+  let nextMoves = legalMoves(start);
+  let key = start.toString();
+  adjList.set(key, nextMoves);
+  for (let move of adjList.get(key)) {
+    if (!adjList.has(move.toString())) {
+      createGraph(move, adjList);
+    }
+  }
+  return adjList;
+}
+
+console.log(createGraph([0, 0]));
