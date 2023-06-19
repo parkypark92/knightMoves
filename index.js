@@ -1,12 +1,12 @@
-const board = [];
+const board = {};
 for (let i = 0; i <= 7; i++) {
   for (let j = 0; j <= 7; j++) {
-    let square = [i, j];
-    board.push(square);
+    let square = `${i},${j}`;
+    board[square] = { prev: "", visited: false };
   }
 }
 
-const knight = { coord: [] };
+const knight = { coord: "" };
 
 function legalMoves(coord) {
   let x = coord[0];
@@ -30,7 +30,7 @@ function legalMoves(coord) {
   return legal;
 }
 
-function createGraph(start, adjList = new Map()) {
+function createGraph(start = [0, 0], adjList = new Map()) {
   let nextMoves = legalMoves(start);
   let key = start.toString();
   adjList.set(key, nextMoves);
@@ -42,4 +42,40 @@ function createGraph(start, adjList = new Map()) {
   return adjList;
 }
 
-console.log(createGraph([0, 0]));
+const movesMap = createGraph();
+
+function findShortestPath(start, dest) {
+  let startPosition = start.toString();
+  let endPosition = dest.toString();
+  let q = [startPosition];
+  while (q.length !== 0) {
+    let current = q.shift();
+    board[current].visited = true;
+    if (current === endPosition) {
+      return printPath(startPosition, endPosition);
+    }
+    for (let move of movesMap.get(current)) {
+      let coords = move.toString();
+      if (!board[coords].visited) {
+        board[coords].prev = current;
+        q.push(coords);
+      }
+    }
+  }
+}
+
+function printPath(start, end) {
+  let path = [];
+  let coord = end;
+  while (board[coord].prev !== "") {
+    path.unshift(coord);
+    coord = board[coord].prev;
+  }
+  path.unshift(start);
+  console.log(path);
+  for (let move of path) {
+    console.log(move);
+  }
+}
+
+findShortestPath([3, 3], [6, 5]);
